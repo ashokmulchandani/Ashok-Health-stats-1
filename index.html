@@ -39,8 +39,11 @@
   <h1>💪 Ashok Daily Entry</h1>
   <div class="sub">v5 · offline queue. Fill what you have → press ①. Away from home it saves on your phone; back home, ② → ③ → ④. All sections tap-to-collapse.</div>
 
-  <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-weight:700;color:#7a5c00">
+  <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:10px 14px;margin-bottom:8px;font-weight:700;color:#7a5c00">
     📦 PENDING ON THIS PHONE: <span id="topqcount" style="font-size:1.2rem">0</span>
+  </div>
+  <div class="btnnote" style="margin-bottom:14px">
+    🟦 Button colours: <b style="color:#1f4e78">BLUE = save now</b> · <b>GREY = move the queue</b> · <b style="color:#2e7d32">GREEN = sync to Excel</b>
   </div>
 
   <div id="wronghost" class="card" style="display:none">
@@ -146,24 +149,51 @@
     </details>
 
     <button type="submit" id="save">① Save to workbook</button>
-    <div class="btnnote" style="text-align:center">Press FIRST after filling fields. At home → writes straight into Excel. Away from home → saves on this phone (the PENDING number above goes up).</div>
+    <div class="btnnote" style="text-align:left; margin-top:6px">
+      <b>Before pressing ①:</b>
+      <ol style="margin:4px 0 0 18px; padding:0">
+        <li>Pick the date at the top.</li>
+        <li>Fill any fields you have right now (can be just one).</li>
+        <li>If at home: close the workbook in Excel first.</li>
+      </ol>
+    </div>
 
     <div class="card" style="background:#eef4fa; margin-top:14px">
-      <h2>📦 Queue tools — use in order ② → ③ → ④ (only when away from home)</h2>
+      <h2>📦 Queue tools — only when away from home. Order: ② → ③ → ④</h2>
       <div id="qlist" style="font-size:.8rem;color:var(--muted);margin-bottom:10px"></div>
       <div class="field">
         <button type="button" id="copylink" style="background:#6c757d">② Copy queue link</button>
-        <div class="btnnote">On the ONLINE copy, when entries are pending — copies them into one link.</div>
+        <div class="btnnote">
+          <b>Before pressing ②:</b>
+          <ol style="margin:4px 0 0 18px; padding:0">
+            <li>Check the PENDING number above is more than 0.</li>
+            <li>Do this on the ONLINE copy (github.io link) before you travel home.</li>
+          </ol>
+        </div>
       </div>
       <div class="field" style="margin-top:10px">
         <label for="importbox">Paste queue link here</label>
         <input type="text" id="importbox" placeholder=".../#q=...">
         <button type="button" id="importbtn" style="background:#6c757d; margin-top:6px">③ Import queue link</button>
-        <div class="btnnote">At HOME: paste the link from ② above, then press ③ to bring the entries onto this form.</div>
+        <div class="btnnote">
+          <b>Before pressing ③:</b>
+          <ol style="margin:4px 0 0 18px; padding:0">
+            <li>You must be on the HOME form (http://192.168.x.x:8765), not the online copy.</li>
+            <li>Paste the link you got from ② into the box above.</li>
+          </ol>
+        </div>
       </div>
       <div class="field" style="margin-top:10px">
         <button type="button" id="syncbtn" style="background:#2e7d32">④ Sync now</button>
-        <div class="btnnote">At HOME (PC on, Excel closed) — writes all pending entries into the workbook.</div>
+        <div class="btnnote">
+          <b>Before pressing ④:</b>
+          <ol style="margin:4px 0 0 18px; padding:0">
+            <li>At home on the HOME form link.</li>
+            <li>PC is ON and the black connector window is running.</li>
+            <li>Workbook is CLOSED in Excel.</li>
+            <li>PENDING number is more than 0 (else nothing to sync).</li>
+          </ol>
+        </div>
       </div>
     </div>
   </form>
