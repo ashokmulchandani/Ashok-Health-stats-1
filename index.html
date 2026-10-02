@@ -293,8 +293,21 @@
     const v = $("date").value;
     $("day").value = v ? days[new Date(v + "T00:00:00").getDay()] : "";
   }
-  $("date").addEventListener("change", syncDay);
+  $("date").addEventListener("change", () => {
+    const newVal = $("date").value;
+    if (newVal === lastDate) return;
+    const hasData = FIELD_IDS.some(id => $(id).value) || $("comment").value.trim();
+    if (hasData && !confirm("Change date? The fields you've typed will be CLEARED so the new date starts fresh. (Your earlier saves are already safe in the queue.)")) {
+      $("date").value = lastDate;
+      return;
+    }
+    lastDate = newVal;
+    FIELD_IDS.forEach(id => $(id).value = "");
+    $("comment").value = "";
+    syncDay();
+  });
   setToday();
+  let lastDate = $("date").value;
 
   const FIELD_IDS = ["weight","bf","lean","lean_pct","subcut","subcut_pct","visceral","skeletal_muscle",
     "skeletal_mass","bone_mineral","body_water_pct","extracellular","intracellular","mineral_mass",
