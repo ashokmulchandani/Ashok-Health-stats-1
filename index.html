@@ -37,7 +37,11 @@
 <body>
 <div class="wrap">
   <h1>💪 Ashok Daily Entry</h1>
-  <div class="sub">v4 · offline queue. Type only what you have right now → Save. Away from home it saves on your phone; back home, Import + Sync. All sections below can be tapped to collapse.</div>
+  <div class="sub">v5 · offline queue. Fill what you have → press ①. Away from home it saves on your phone; back home, ② → ③ → ④. All sections tap-to-collapse.</div>
+
+  <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:10px 14px;margin-bottom:14px;font-weight:700;color:#7a5c00">
+    📦 PENDING ON THIS PHONE: <span id="topqcount" style="font-size:1.2rem">0</span>
+  </div>
 
   <div id="wronghost" class="card" style="display:none">
     ⚠️ You're viewing the GitHub copy — saving only works from the connector's own page
@@ -141,32 +145,27 @@
       </div>
     </details>
 
-    <div class="card" style="background:#eef4fa">
-      <h2>📦 Pending on this phone: <span id="qcount">0</span></h2>
-      <div class="grid" style="grid-template-columns:1fr 1fr">
-        <div class="field">
-          <button type="button" id="syncbtn" style="background:#2e7d32">④ Sync now</button>
-          <div class="btnnote">At HOME (PC on, Excel closed) — writes all pending entries into the workbook.</div>
-        </div>
-        <div class="field">
-          <button type="button" id="copylink" style="background:#6c757d">② Copy queue link</button>
-          <div class="btnnote">On the ONLINE copy, when entries are pending — copies them into one link.</div>
-        </div>
-      </div>
-      <div class="field full" style="margin-top:8px">
-        <label for="importbox">Paste queue link here (when you switch from the online copy to the home form)</label>
-        <input type="text" id="importbox" placeholder=".../#q=...">
-      </div>
-      <div class="field full" style="margin-top:8px">
-        <label for="importbtn"></label>
-        <button type="button" id="importbtn" style="background:#6c757d">③ Import queue link</button>
-        <div class="btnnote">At HOME: paste the link from ② into the box above, then press this to bring the entries onto this form.</div>
-      </div>
-      <div id="qlist" style="font-size:.8rem;color:var(--muted);margin-top:8px"></div>
-    </div>
-
     <button type="submit" id="save">① Save to workbook</button>
-    <div class="btnnote" style="text-align:center">Press FIRST after filling fields. At home → writes straight into Excel. Away from home → saves on this phone (pending counter goes up).</div>
+    <div class="btnnote" style="text-align:center">Press FIRST after filling fields. At home → writes straight into Excel. Away from home → saves on this phone (the PENDING number above goes up).</div>
+
+    <div class="card" style="background:#eef4fa; margin-top:14px">
+      <h2>📦 Queue tools — use in order ② → ③ → ④ (only when away from home)</h2>
+      <div id="qlist" style="font-size:.8rem;color:var(--muted);margin-bottom:10px"></div>
+      <div class="field">
+        <button type="button" id="copylink" style="background:#6c757d">② Copy queue link</button>
+        <div class="btnnote">On the ONLINE copy, when entries are pending — copies them into one link.</div>
+      </div>
+      <div class="field" style="margin-top:10px">
+        <label for="importbox">Paste queue link here</label>
+        <input type="text" id="importbox" placeholder=".../#q=...">
+        <button type="button" id="importbtn" style="background:#6c757d; margin-top:6px">③ Import queue link</button>
+        <div class="btnnote">At HOME: paste the link from ② above, then press ③ to bring the entries onto this form.</div>
+      </div>
+      <div class="field" style="margin-top:10px">
+        <button type="button" id="syncbtn" style="background:#2e7d32">④ Sync now</button>
+        <div class="btnnote">At HOME (PC on, Excel closed) — writes all pending entries into the workbook.</div>
+      </div>
+    </div>
   </form>
 
   <div id="status"></div>
@@ -186,7 +185,7 @@
   const saveQ = q => { try { localStorage.setItem(QKEY, JSON.stringify(q)); } catch(e) {} renderQ(); };
   const renderQ = () => {
     const q = loadQ();
-    $("qcount").textContent = q.length;
+    $("topqcount").textContent = q.length;
     $("qlist").innerHTML = q.length
       ? q.map((e,i) => `• ${e.date} (${Object.keys(e).filter(k=>e[k]!==null&&k!=="date"&&k!=="day").length} fields) <a href="#" data-del="${i}" style="color:#c0392b">✕</a>`).join("<br>")
       : "No pending entries.";
