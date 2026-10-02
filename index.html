@@ -36,7 +36,7 @@
 <body>
 <div class="wrap">
   <h1>💪 Ashok Daily Entry</h1>
-  <div class="sub">Type only what you have right now → Save. You can come back later and add more for the same day — each save only writes the fields you filled.</div>
+  <div class="sub">v4 · offline queue. Type only what you have right now → Save. Away from home it saves on your phone; back home, Import + Sync. All sections below can be tapped to collapse.</div>
 
   <div id="wronghost" class="card" style="display:none">
     ⚠️ You're viewing the GitHub copy — saving only works from the connector's own page
@@ -52,8 +52,8 @@
       </div>
     </div>
 
-    <div class="card">
-      <h2>⚖️ HUME scale</h2>
+    <details class="card" open>
+      <summary>⚖️ HUME scale</summary>
       <div class="grid">
         <div class="field"><label>Weight (kg)</label><input type="number" id="weight" step="0.1"></div>
         <div class="field"><label>Body fat %</label><input type="number" id="bf" step="0.1"></div>
@@ -73,7 +73,7 @@
         <div class="field"><label>Metabolic age</label><input type="number" id="metabolic_age" step="1"></div>
         <div class="field"><label>Body cell mass (kg)</label><input type="number" id="body_cell_mass" step="0.1"></div>
       </div>
-    </div>
+    </details>
 
     <details class="card">
       <summary>🦾 HUME limb distribution (optional)</summary>
@@ -91,8 +91,8 @@
       </div>
     </details>
 
-    <div class="card">
-      <h2>🏃 Fitbit / activity</h2>
+    <details class="card" open>
+      <summary>🏃 Fitbit / activity</summary>
       <div class="grid">
         <div class="field"><label>Steps</label><input type="number" id="steps" step="1"></div>
         <div class="field"><label>Distance (km)</label><input type="number" id="distance" step="0.1"></div>
@@ -105,7 +105,7 @@
         <div class="field"><label>HIIT rounds</label><input type="number" id="hiit" step="1"></div>
         <div class="field"><label>Water (ml)</label><input type="number" id="water" step="50"></div>
       </div>
-    </div>
+    </details>
 
     <details class="card">
       <summary>📿 HUME band (optional)</summary>
@@ -133,18 +133,18 @@
       </div>
     </details>
 
-    <div class="card">
-      <h2>💬 Ashok's comment</h2>
+    <details class="card" open>
+      <summary>💬 Ashok's comment</summary>
       <div class="field full">
         <textarea id="comment" placeholder="Anything to note - fast day, not well, birthday..."></textarea>
       </div>
-    </div>
+    </details>
 
     <div class="card" style="background:#eef4fa">
       <h2>📦 Pending on this phone: <span id="qcount">0</span></h2>
       <div class="grid" style="grid-template-columns:1fr 1fr">
-        <div class="field"><button type="button" id="syncbtn" style="background:#2e7d32">🔄 Sync now</button></div>
-        <div class="field"><button type="button" id="copylink" style="background:#6c757d">🔗 Copy queue link</button></div>
+        <div class="field"><button type="button" id="syncbtn" style="background:#2e7d32">④ Sync now</button></div>
+        <div class="field"><button type="button" id="copylink" style="background:#6c757d">② Copy queue link</button></div>
       </div>
       <div class="field full" style="margin-top:8px">
         <label for="importbox">Paste queue link here (when you switch from the online copy to the home form)</label>
@@ -152,12 +152,12 @@
       </div>
       <div class="field full" style="margin-top:8px">
         <label for="importbtn"></label>
-        <button type="button" id="importbtn" style="background:#6c757d">📥 Import queue link</button>
+        <button type="button" id="importbtn" style="background:#6c757d">③ Import queue link</button>
       </div>
       <div id="qlist" style="font-size:.8rem;color:var(--muted);margin-top:8px"></div>
     </div>
 
-    <button type="submit" id="save">Save to workbook</button>
+    <button type="submit" id="save">① Save to workbook</button>
   </form>
 
   <div id="status"></div>
@@ -292,7 +292,7 @@
       }
       $("form").reset(); setToday();
     } finally {
-      $("save").disabled = false; $("save").textContent = "Save to workbook";
+      $("save").disabled = false; $("save").textContent = "① Save to workbook";
     }
   });
 </script>
