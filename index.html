@@ -140,6 +140,23 @@
       </div>
     </div>
 
+    <div class="card" style="background:#eef4fa">
+      <h2>📦 Pending on this phone: <span id="qcount">0</span></h2>
+      <div class="grid" style="grid-template-columns:1fr 1fr">
+        <div class="field"><button type="button" id="syncbtn" style="background:#2e7d32">🔄 Sync now</button></div>
+        <div class="field"><button type="button" id="copylink" style="background:#6c757d">🔗 Copy queue link</button></div>
+      </div>
+      <div class="field full" style="margin-top:8px">
+        <label for="importbox">Paste queue link here (when you switch from the online copy to the home form)</label>
+        <input type="text" id="importbox" placeholder=".../#q=...">
+      </div>
+      <div class="field full" style="margin-top:8px">
+        <label for="importbtn"></label>
+        <button type="button" id="importbtn" style="background:#6c757d">📥 Import queue link</button>
+      </div>
+      <div id="qlist" style="font-size:.8rem;color:var(--muted);margin-top:8px"></div>
+    </div>
+
     <button type="submit" id="save">Save to workbook</button>
   </form>
 
@@ -152,6 +169,81 @@
   const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 
   if (/github\.io|githubusercontent/.test(location.hostname)) $("wronghost").style.display = "block";
+
+  // ---------------- queue (works away from home) ----------------
+  const QKEY = "ashok_entries_queue";
+  const isHome = /localhost|127\.0\.0\.1|192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\./.test(location.hostname);
+  const loadQ = () => { try { return JSON.parse(localStorage.getItem(QKEY) || "[]"); } catch(e) { return []; } };
+  const saveQ = q => { try { localStorage.setItem(QKEY, JSON.stringify(q)); } catch(e) {} renderQ(); };
+  const renderQ = () => {
+    const q = loadQ();
+    $("qcount").textContent = q.length;
+    $("qlist").innerHTML = q.length
+      ? q.map((e,i) => `• ${e.date} (${Object.keys(e).filter(k=>e[k]!==null&&k!=="date"&&k!=="day").length} fields) <a href="#" data-del="${i}" style="color:#c0392b">✕</a>`).join("<br>")
+      : "No pending entries.";
+    document.querySelectorAll("[data-del]").forEach(a => a.onclick = ev => {
+      ev.preventDefault();
+      const qq = loadQ(); qq.splice(+a.dataset.del, 1); saveQ(qq);
+    });
+  };
+  const b64 = s => btoa(unescape(encodeURIComponent(s))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+  const unb64 = s => { try { return decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/g,"/")))); } catch(e) { return null; } };
+
+  async function syncAll() {
+    const q = loadQ();
+    if (!q.length) { setStatus(false, "Nothing pending to sync."); return; }
+    if (!isHome) { setStatus(false, "Not on home Wi-Fi - open the home form link (http://192.168.x.x:8765), paste your queue link, then Sync."); return; }
+    let done = 0, left = [];
+    for (const entry of q) {
+      try {
+        const res = await fetch("/submit", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(entry) });
+        const data = await res.json();
+        if (data.ok) done++; else left.push(entry);
+      } catch(e) { left.push(entry); }
+    }
+    saveQ(left);
+    setStatus(done > 0, done > 0
+      ? `✅ Synced ${done} entr${done===1?"y":"ies"} to the workbook.${left.length ? ` ${left.length} still pending - close Excel and try again.` : ""}`
+      : `❌ Could not sync (${q.length} still pending). Is the connector running and the workbook closed?`);
+  }
+
+  $("syncbtn").onclick = syncAll;
+  $("copylink").onclick = () => {
+    const q = loadQ();
+    if (!q.length) { setStatus(false, "Nothing to copy - the queue is empty."); return; }
+    const url = location.href.split("#")[0] + "#q=" + b64(JSON.stringify(q));
+    navigator.clipboard.writeText(url).then(() => setStatus(true, "✅ Queue link copied. Keep it - on the home form, paste it and press Import."),
+      () => setStatus(false, "Could not copy. Long-press and copy this instead:\n" + url));
+  };
+  $("importbtn").onclick = () => {
+    const raw = $("importbox").value.trim();
+    if (!raw) { setStatus(false, "Paste a queue link first."); return; }
+    const hash = raw.split("#q=")[1];
+    const json = hash ? unb64(hash) : null;
+    if (!json) { setStatus(false, "That link does not contain a queue."); return; }
+    try {
+      const incoming = JSON.parse(json);
+      const merged = loadQ().concat(incoming);
+      saveQ(merged); $("importbox").value = "";
+      setStatus(true, `📥 Imported ${incoming.length} entr${incoming.length===1?"y":"ies"}. Press Sync now to write them to the workbook.`);
+    } catch(e) { setStatus(false, "Could not read that queue link."); }
+  };
+  // auto-import from URL hash
+  (function() {
+    const m = location.hash.match(/[#&]q=([A-Za-z0-9_-]+)/);
+    if (m) {
+      const json = unb64(m[1]);
+      if (json) {
+        try {
+          const incoming = JSON.parse(json);
+          saveQ(loadQ().concat(incoming));
+          history.replaceState(null, "", location.pathname);
+          setStatus(true, `📥 Imported ${incoming.length} entr${incoming.length===1?"y":"ies"} from the link. Press Sync now.`);
+        } catch(e) {}
+      }
+    }
+  })();
+  renderQ();
 
   function setToday() {
     const now = new Date();
@@ -174,28 +266,31 @@
     "sleep_quality_hume","sleep_hours_hume","hume_active_cal","hume_steps","stress_hume","hrv_hume",
     "temp_min","temp_max","calories_eaten","protein","carbs","fat","sat_fat","fiber"];
 
+  function setStatus(ok, text) {
+    const status = $("status");
+    status.className = ok ? "ok" : "err";
+    status.textContent = text;
+  }
+
   $("form").addEventListener("submit", async e => {
     e.preventDefault();
     const status = $("status");
     status.className = ""; status.style.display = "none";
     const payload = { date: $("date").value, day: $("day").value, comment: $("comment").value.trim() || null };
     for (const id of FIELD_IDS) payload[id] = $(id).value || null;
-    if (!payload.date) { status.className = "err"; status.textContent = "Please pick the date."; return; }
+    if (!payload.date) { setStatus(false, "Please pick the date."); return; }
     const filled = Object.values(payload).filter(v => v !== null).length;
-    if (filled <= 2) { status.className = "err"; status.textContent = "Nothing to save - fill at least one field."; return; }
+    if (filled <= 2) { setStatus(false, "Nothing to save - fill at least one field."); return; }
     $("save").disabled = true; $("save").textContent = "Saving...";
     try {
-      const res = await fetch("/submit", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(payload) });
-      const data = await res.json();
-      if (data.ok) {
-        status.className = "ok";
-        status.textContent = "✅ Saved!\n" + (data.message || "") + (data.updated && data.updated.length ? "\nWritten: " + data.updated.join(", ") : "");
-        $("form").reset(); setToday();
+      // always queue locally first (survives being away from home)
+      saveQ(loadQ().concat([payload]));
+      if (isHome) {
+        await syncAll();
       } else {
-        status.className = "err"; status.textContent = "❌ " + (data.message || "Could not save.");
+        setStatus(true, "📱 Saved on this phone (away from home). It will sync to the workbook when you're back on Wi-Fi: open the home form, paste your queue link, and press Sync. (" + loadQ().length + " pending)");
       }
-    } catch (err) {
-      status.className = "err"; status.textContent = "❌ Cannot reach the local connector. Is start_ashok_form.bat running? (" + err.message + ")";
+      $("form").reset(); setToday();
     } finally {
       $("save").disabled = false; $("save").textContent = "Save to workbook";
     }
