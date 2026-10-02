@@ -29,6 +29,7 @@
   details.card summary { cursor:pointer; font-weight:700; color:var(--accent); }
   details.card[open] summary { margin-bottom:12px; }
   .hint { font-size:.75rem; color:var(--muted); margin-top:12px; }
+  .btnnote { font-size:.72rem; color:var(--muted); margin-top:4px; line-height:1.35; }
   #wronghost { background:#fff8e1; border-color:#ffd54f; }
   @media (max-width:460px) { .grid { grid-template-columns:1fr; } }
 </style>
@@ -143,8 +144,14 @@
     <div class="card" style="background:#eef4fa">
       <h2>📦 Pending on this phone: <span id="qcount">0</span></h2>
       <div class="grid" style="grid-template-columns:1fr 1fr">
-        <div class="field"><button type="button" id="syncbtn" style="background:#2e7d32">④ Sync now</button></div>
-        <div class="field"><button type="button" id="copylink" style="background:#6c757d">② Copy queue link</button></div>
+        <div class="field">
+          <button type="button" id="syncbtn" style="background:#2e7d32">④ Sync now</button>
+          <div class="btnnote">At HOME (PC on, Excel closed) — writes all pending entries into the workbook.</div>
+        </div>
+        <div class="field">
+          <button type="button" id="copylink" style="background:#6c757d">② Copy queue link</button>
+          <div class="btnnote">On the ONLINE copy, when entries are pending — copies them into one link.</div>
+        </div>
       </div>
       <div class="field full" style="margin-top:8px">
         <label for="importbox">Paste queue link here (when you switch from the online copy to the home form)</label>
@@ -153,11 +160,13 @@
       <div class="field full" style="margin-top:8px">
         <label for="importbtn"></label>
         <button type="button" id="importbtn" style="background:#6c757d">③ Import queue link</button>
+        <div class="btnnote">At HOME: paste the link from ② into the box above, then press this to bring the entries onto this form.</div>
       </div>
       <div id="qlist" style="font-size:.8rem;color:var(--muted);margin-top:8px"></div>
     </div>
 
     <button type="submit" id="save">① Save to workbook</button>
+    <div class="btnnote" style="text-align:center">Press FIRST after filling fields. At home → writes straight into Excel. Away from home → saves on this phone (pending counter goes up).</div>
   </form>
 
   <div id="status"></div>
