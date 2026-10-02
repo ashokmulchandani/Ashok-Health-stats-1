@@ -37,13 +37,58 @@ if os.path.exists(os.path.join(BASE_DIR, "config.json")):
 COLUMNS = {
     "weight": 3,          # C  Morning weight (kg)
     "bf": 4,              # D  Body fat %
+    "lean": 6,            # F  Lean mass (kg, Enter)
+    "lean_pct": 7,        # G  Lean mass % Entered
+    "subcut": 8,          # H  Subcutaneous fat Mass
+    "subcut_pct": 9,      # I  Subcutaneous fat %
+    "visceral": 12,       # L  Visceral Fat Index
+    "skeletal_muscle": 13,  # M  Skeletal Muscle Mass
+    "skeletal_mass": 14,  # N  Skeletal Mass
+    "bone_mineral": 15,   # O  Bone Mineral Content
+    "body_water_pct": 16, # P  Body Water %
+    "extracellular": 17,  # Q  Extracellular Water
+    "intracellular": 18,  # R  Intracellular Water
+    "mineral_mass": 19,   # S  Mineral Mass(Kg)
+    "hume_bmr": 20,       # T  HUME BMR
+    "metabolic_age": 21,  # U  Metabolic Age
+    "body_cell_mass": 22, # V  Body Cell Mass(Kg)
+    "right_arm": 23,      # W  Right ARM KG
+    "left_arm": 24,       # X  LEFT ARM KG
+    "torso": 25,          # Y  TORSO KG
+    "right_leg": 26,      # Z  RIGHT Leg KG
+    "left_leg": 27,       # AA LEFT Leg KG
+    "fat_right_arm": 28,  # AB Right ARM KG (fat)
+    "fat_left_arm": 29,   # AC LEFT ARM KG (fat)
+    "fat_torso": 30,      # AD TORSO KG (fat)
+    "fat_right_leg": 31,  # AE RIGHT Leg KG (fat)
+    "fat_left_leg": 32,   # AF LEFT Leg KG (fat)
+    "calories_eaten": 33, # AG Calories eaten
+    "protein": 35,        # AI Protein (g)
+    "carbs": 36,          # AJ Carbs (g)
+    "fat": 37,            # AK Fat (g)
+    "sat_fat": 38,        # AL Saturated Fat g
+    "fiber": 39,          # AM Fiber g
+    "water": 60,          # AN Water Ml
+    "calories_burned": 41,# AO Calories burned fitbit
     "steps": 42,          # AP Steps fitbit
+    "distance": 43,       # AQ Distance FITBIT KM
+    "hrv_fitbit": 44,     # AR HRV (ms) fitbit
+    "rhr": 45,            # AS RHR (bpm) fitbit
+    "gym_time": 46,       # AT Gym time (min)
     "hiit": 47,           # AU HIIT rounds
     "sleep_h": 48,        # AV Sleep (h) fitbit
     "sleep_score": 49,    # AW Sleep SCORE fitbit
-    "water": 60,          # AN Water Ml
+    "sleep_quality_hume": 50,  # AX SLEEP Quality Hume (text)
+    "sleep_hours_hume": 51,    # AY SLEEP HOURS HUME (text/number)
+    "hume_active_cal": 52,     # AZ HUME Active Calories
+    "hume_steps": 53,          # BA Hume Steps
+    "stress_hume": 54,         # BB Stress Level Hume
+    "hrv_hume": 55,            # BC HRV HUME
+    "temp_min": 56,            # BD Body Temperature Min
+    "temp_max": 57,            # BE Body Temperature MAX
     "comment": 59,        # BG ASHOK COMMENTS Notes
 }
+TEXT_FIELDS = {"comment", "sleep_quality_hume", "sleep_hours_hume"}
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
 
@@ -88,14 +133,14 @@ def apply_entry(payload):
         raw = payload.get(field)
         if raw in (None, ""):
             continue
-        if field in ("weight", "bf", "steps", "hiit", "sleep_h", "sleep_score", "water"):
+        if field in TEXT_FIELDS:
+            val = str(raw)
+        else:
             try:
                 val = float(raw)
-            except ValueError:
+            except (ValueError, TypeError):
                 continue
             val = int(val) if val == int(val) else val
-        else:
-            val = str(raw)
         cell = dm.cell(row=row, column=col)
         cell.value = val
         updated.append(field.replace("_", " "))
