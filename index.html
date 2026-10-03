@@ -40,7 +40,7 @@
 <body>
 <div class="wrap">
   <h1>💪 Ashok Daily Entry</h1>
-  <div class="sub">v5 · offline queue. Fill what you have → press ①. Away from home it saves on your phone; back home, ② → ③ → ④. All sections tap-to-collapse.</div>
+  <div class="sub">v7 · offline queue. Fill what you have → press ①. Away from home it saves on your phone; back home, ② → ③ → ④. All sections tap-to-collapse. <span id="modetag"></span></div>
 
   <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:10px 14px;margin-bottom:8px;font-weight:700;color:#7a5c00">
     📦 PENDING ON THIS PHONE: <span id="topqcount" style="font-size:1.2rem">0</span>
@@ -214,6 +214,7 @@
   // ---------------- queue (works away from home) ----------------
   const QKEY = "ashok_entries_queue";
   const isHome = /localhost|127\.0\.0\.1|192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\./.test(location.hostname);
+  $("modetag").textContent = isHome ? "— 🏠 HOME mode (saves straight to Excel)" : "— ✈️ AWAY mode (saves on this phone)";
   const loadQ = () => { try { return JSON.parse(localStorage.getItem(QKEY) || "[]"); } catch(e) { return []; } };
   const saveQ = q => { try { localStorage.setItem(QKEY, JSON.stringify(q)); } catch(e) {} renderQ(); };
   const renderQ = () => {
@@ -355,6 +356,8 @@
         setStatus(true, "📱 Saved on this phone (away from home). It will sync to the workbook when you're back on Wi-Fi: open the home form, paste your queue link, and press Sync. (" + loadQ().length + " pending)");
       }
       $("form").reset(); setToday();
+    } catch (err) {
+      setStatus(false, "❌ Something went wrong while saving: " + err.message + " (build v7). Please take a screenshot and tell Claude.");
     } finally {
       $("save").disabled = false; $("save").textContent = "① Save to workbook";
     }
