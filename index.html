@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Ashok Daily Entry</title>
 <style>
   :root { --bg:#f4f6f8; --card:#fff; --ink:#1f2d3d; --muted:#5b6b7c; --accent:#1f4e78; --line:#d9e2ec; --err:#c0392b; --ok:#2e7d32; }
@@ -250,8 +253,18 @@
     const q = loadQ();
     if (!q.length) { setStatus(false, "Nothing to copy - the queue is empty."); return; }
     const url = location.href.split("#")[0] + "#q=" + b64(JSON.stringify(q));
-    navigator.clipboard.writeText(url).then(() => setStatus(true, "✅ Queue link copied. Keep it - on the home form, paste it and press Import."),
-      () => setStatus(false, "Could not copy. Long-press and copy this instead:\n" + url));
+    const fallback = () => {
+      $("importbox").value = url;
+      setStatus(true, "✅ The queue link is now in the paste box above - long-press the box and choose Copy.");
+    };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(
+          () => setStatus(true, "✅ Queue link copied. Keep it - on the home form, paste it and press ③."),
+          fallback
+        );
+      } else fallback();
+    } catch (e) { fallback(); }
   };
   $("importbtn").onclick = () => {
     const raw = $("importbox").value.trim();
