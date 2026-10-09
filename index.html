@@ -40,7 +40,7 @@
 <body>
 <div class="wrap">
   <h1>💪 Ashok Daily Entry</h1>
-  <div class="sub">v8 · offline queue. Fill what you have → press ①. Away from home it saves on your phone; back home, ② → ③ → ④. All sections tap-to-collapse. <span id="modetag"></span></div>
+  <div class="sub">v9 · offline queue. Fill what you have → press ①. Away from home it saves on your phone; back home, ② → ③ → ④. All sections tap-to-collapse. <span id="modetag"></span></div>
 
   <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:10px 14px;margin-bottom:8px;font-weight:700;color:#7a5c00">
     📦 PENDING ON THIS PHONE: <span id="topqcount" style="font-size:1.2rem">0</span>
@@ -161,6 +161,8 @@
       </ol>
     </div>
 
+    <div id="status"></div>
+
     <div class="card" style="background:#eef4fa; margin-top:14px">
       <h2>📦 Queue tools — only when away from home. Order: ② → ③ → ④</h2>
       <div id="qlist" style="font-size:.8rem;color:var(--muted);margin-bottom:10px"></div>
@@ -201,7 +203,6 @@
     </div>
   </form>
 
-  <div id="status"></div>
   <div class="hint">Only the fields you fill are written — everything else stays untouched. You can save several times a day (e.g., comment now, body fat in a few hours); they merge into the same day's row.</div>
 </div>
 
@@ -335,7 +336,19 @@
     const status = $("status");
     status.className = ok ? "ok" : "err";
     status.textContent = text;
+    try { status.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) {}
   }
+
+  // make ANY unexpected error visible in the message box instead of failing silently
+  window.onerror = function (msg, src, line) {
+    const status = $("status");
+    if (status) {
+      status.className = "err";
+      status.textContent = "❌ Page error: " + msg + " (line " + line + ") - screenshot this and tell Claude. Build v9.";
+      try { status.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) {}
+    }
+    return false;
+  };
 
   $("form").addEventListener("submit", async e => {
     e.preventDefault();
